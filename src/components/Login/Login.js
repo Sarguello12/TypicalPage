@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useContext } from 'react';
+import React, { useState, useEffect, useReducer, useContext, useRef } from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
@@ -40,6 +40,8 @@ const Login = (props) => {
   });
 
   const authctx = useContext(AuthContext);
+  const emailInputRef = useRef();
+  const passwordInputRef = useRef();
 
   //object destructuring
   //this will allow useEffect only to run when the validity of the email or password has changed not just the value stored
@@ -78,13 +80,21 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    authctx.onLogin(emailState.value, passwordState.value);
+
+    if(formIsValid) {
+      authctx.onLogin(emailState.value, passwordState.value);
+    } else if (!emailIsValid) {
+      emailInputRef.current.activate();
+    } else {
+      passwordInputRef.current.activate();
+    }
   };
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
         <Input 
+          ref={emailInputRef}
           id="email" 
           label="E-mail" 
           type="email" 
@@ -94,6 +104,7 @@ const Login = (props) => {
           onBlur={validateEmailHandler}
         />
         <Input 
+          ref={passwordInputRef}
           id="password" 
           label="Password" 
           type="password" 
